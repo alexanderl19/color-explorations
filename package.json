@@ -20,6 +20,7 @@
 		"@sveltejs/kit": "2.5.24",
 		"@sveltejs/vite-plugin-svelte": "3.1.2",
 		"@types/eslint": "7.28.0",
+		"colorjs.io": "0.5.2",
 		"eslint": "8.57.0",
 		"globals": "15.9.0",
 		"poline": "0.7.0",
