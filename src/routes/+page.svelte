@@ -2,18 +2,29 @@
 	import { ColorSpace, sRGB, HSL, parse, to } from 'colorjs.io/fn';
 	import { Poline } from 'poline';
 
-	let anchorColors = ['#4F405E', '#191b0e'];
+	let colors = '#4F405E\n#191b0e';
+	$: anchorColors = colors.split('\n');
 	let numPoints = 2;
 
 	ColorSpace.register(sRGB);
 	ColorSpace.register(HSL);
-	$: anchorColorsHSL = anchorColors.map((color) => {
-		const [hue, saturation, lightness] = to(parse(color), 'hsl').coords;
-		return [hue, saturation / 100, lightness / 100] as [number, number, number];
-	});
+	$: anchorColorsHSL = anchorColors
+		.map((color) => {
+			try {
+				const [hue, saturation, lightness] = to(parse(color), 'hsl').coords;
+				return [hue, saturation / 100, lightness / 100] as [number, number, number];
+			} catch (e) {}
+		})
+		.filter((color) => color !== undefined);
 
 	$: poline = new Poline({
-		anchorColors: anchorColorsHSL,
+		anchorColors:
+			anchorColorsHSL.length >= 2
+				? anchorColorsHSL
+				: [
+						[0, 0, 0],
+						[1, 1, 1],
+					],
 		numPoints,
 	});
 </script>
@@ -24,17 +35,10 @@
 	{/each}
 </div>
 <div class="inputs">
-	{#each anchorColors as color, i}
-		<label>
-			<span>Anchor Color {i + 1}</span>
-			<input type="color" bind:value={color} />
-		</label>
-		<button
-			disabled={anchorColors.length === 2}
-			on:click={() => (anchorColors = anchorColors.filter((_, j) => j !== i))}>Remove</button
-		>
-	{/each}
-	<button on:click={() => (anchorColors = [...anchorColors, '#191b0e'])}>Add Anchor</button>
+	<label>
+		<span>Anchor Colors</span>
+		<textarea bind:value={colors} />
+	</label>
 	<label>
 		<span>Number of Points</span>
 		<input type="number" min="1" bind:value={numPoints} />
